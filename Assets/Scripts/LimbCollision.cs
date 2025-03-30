@@ -22,8 +22,11 @@ public class LimbCollision : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (!controller.gameObject.CompareTag("canGrab"))
+        {
+            controller.isGrounded = true;
+        }
         
-        controller.isGrounded = true;
         //Debug.Log($"{collision.gameObject.name}");
     }
 }

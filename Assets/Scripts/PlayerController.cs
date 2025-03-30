@@ -1,21 +1,27 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
     public float speed;
-    public float strafeSpeed;
     public float jumpForce;
-    public float rotationSpeed = 10f; // 旋转速度
+    //public float rotationSpeed = 10f; // 旋转速度
+    public ConfigurableJoint hipJoints;
+    Vector3 targetRot = Vector3.zero;
+    Vector3 moveDirection = Vector3.zero;
 
     public Rigidbody hips;
     public bool isGrounded;
 
     public Animator animator;
+
+
     void Start()
     {
         hips = GetComponent<Rigidbody>();
+        //Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()
@@ -37,15 +43,15 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-    private void FixedUpdate()
+
+    void WalkAndRun(KeyCode key , Vector3 aimMoveDir)
     {
-        if (!isGrounded) return;
-
-        Vector3 moveDirection = Vector3.zero;
-
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(key))
         {
-            moveDirection += hips.transform.forward;
+            moveDirection += aimMoveDir;
+            //moveDirection += hips.transform.forward;
+
+            //anima
             animator.SetBool("isWalk", true);
 
             if (Input.GetKey(KeyCode.LeftShift))
@@ -53,34 +59,37 @@ public class PlayerController : MonoBehaviour
                 moveDirection *= 1.5f; // 速度倍率
                 animator.SetBool("isRun", true);
             }
+        }
 
+    }
+    private void FixedUpdate()
+    {
+        //rote
+        hipJoints.targetRotation = Quaternion.Euler(targetRot);
+
+        //move
+        if (!isGrounded) return;
+
+        
+        moveDirection = Vector3.zero;
+        WalkAndRun(KeyCode.W , Vector3.forward);
+        WalkAndRun(KeyCode.A , -Vector3.right);
+        WalkAndRun(KeyCode.S , -Vector3.forward);
+        WalkAndRun(KeyCode.D , Vector3.right);
+
+        if (!Input.GetKey(KeyCode.W) && !Input.GetKey(KeyCode.A) && !Input.GetKey(KeyCode.S) && !Input.GetKey(KeyCode.D))
+        {
+            //anima
+            animator.SetBool("isWalk", false);
         }
 
         if (!Input.GetKey(KeyCode.LeftShift))
         {
+            //anima
             animator.SetBool("isRun", false);
         }
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            moveDirection -= hips.transform.right;
-        }
-
-        if (Input.GetKey(KeyCode.S))
-        {
-            moveDirection -= hips.transform.forward;
-            animator.SetBool("isWalk", true);
-        }
-        else if (!Input.GetKey(KeyCode.W))
-        {
-            animator.SetBool("isWalk", false);
-        }
-
-        if (Input.GetKey(KeyCode.D))
-        {
-            moveDirection += hips.transform.right;
-        }
-
+        
         // 归一化方向，避免对角线速度变快
         if (moveDirection != Vector3.zero)
         {
@@ -88,7 +97,9 @@ public class PlayerController : MonoBehaviour
 
             // **让角色朝向移动方向**
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
-           // hips.rotation = Quaternion.Slerp(hips.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            targetRot = new Vector3(targetRotation.eulerAngles.x, -targetRotation.eulerAngles.y, targetRotation.eulerAngles.z);
+            //root.rotation = Quaternion.Slerp(root.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            
 
             // **移动**
             hips.velocity = new Vector3(moveDirection.x * speed, hips.velocity.y, moveDirection.z * speed);
@@ -98,6 +109,8 @@ public class PlayerController : MonoBehaviour
             // 停止时只保留垂直速度
             hips.velocity = new Vector3(0, hips.velocity.y, 0);
         }
+
+
     }
 
 
