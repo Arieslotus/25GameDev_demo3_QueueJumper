@@ -1,14 +1,18 @@
+using System.Xml.Serialization;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Queuer : MonoBehaviour
 {
-    public Transform target; // 前一个排队者或目标点
+    public Transform target,behind; // 前一个排队者或目标点
     private NavMeshAgent agent;
 
     Animator animator;
 
     public bool isLast = false;
+    public float minDistance = 1.5f; // 设定最小安全距离
+    public float maxDistance = 2f; // 设定最小安全距离
+    public float retreatSpeed = 1.0f; // 设定后退距离
 
     void Start()
     {
@@ -21,26 +25,57 @@ public class Queuer : MonoBehaviour
         //move
         if (target != null)
         {
-            float distance = Vector3.Distance(transform.position, target.position);
-            if (distance > agent.stoppingDistance)
-            {
-                agent.SetDestination(target.position);
-                animator.SetBool("isWalk", true);
-                
-            }
-            else
-            {
-                agent.ResetPath();
-                animator.SetBool("isWalk", false);
-            }
-
+            MoveToTarget();
             FaceTarget(); // 保持朝向目标
+
         } 
         
+        //check dis with front
+
+
         //if is last , check player
         if(isLast)
         {
             DetectPlayerBehind(); // 运行射线检测
+        }
+    }
+
+    private void MoveToTarget()
+    {
+        float distance = Vector3.Distance(transform.position, target.position);
+        if (distance > maxDistance)//agent.stoppingDistance
+        {
+            agent.SetDestination(target.position);
+            animator.SetBool("isWalk", true);
+
+        }
+        else if (distance > minDistance)
+        {
+
+            agent.ResetPath();
+            animator.SetBool("isWalk", false);
+
+        }
+        else
+        {
+            Vector3 retreatDirection = Vector3.zero;
+            if (!isLast)
+            {
+                retreatDirection = (behind.position - target.position).normalized;
+            }
+            else
+            {
+                retreatDirection = (transform.position - target.position).normalized;
+            }
+            
+            Vector3 retreatPosition = retreatDirection * retreatSpeed * Time.deltaTime;
+            //Vector3 retreatPosition = transform.position + retreatDirection * retreatDistance;
+            //agent.SetDestination(retreatPosition);
+            transform.position += retreatPosition;
+
+            animator.SetBool("isWalk", true);
+
+            //Debug.Log("...");
         }
     }
 
@@ -75,6 +110,7 @@ public class Queuer : MonoBehaviour
         // 在 Scene 视图可视化射线
         Debug.DrawRay(rayOrigin, rayDirection * rayDistance, Color.red);
     }
+
 
     void FaceTarget()
     {

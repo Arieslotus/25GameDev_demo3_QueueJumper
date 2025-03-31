@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -9,7 +10,9 @@ public class QueueController : MonoBehaviour
 
     int lastQueuerId = -1;
 
-    void Start()
+    public bool flag = false;
+
+    void Awake()
     {
         GetChildrenRootTransforms();
     }
@@ -17,13 +20,26 @@ public class QueueController : MonoBehaviour
     void Update()
     {
         SetFollowTarget();
+
+        if (flag)
+        {
+            flag = false;
+            Buy();
+        }
     }
 
+    void Buy()
+    {
+        queue_list.Remove(queue_list[1]);
 
+        //queuer go
+    }
     void SetFollowTarget()
     {
         for (int i = 0; i < queue_list.Count; i++)
         {
+            RenameObject(queue_list[i] , i);
+
             if(i > 0 && i < queue_list.Count -1)
             {
                 var queuer = queue_list[i].GetComponent<Queuer>();
@@ -32,6 +48,7 @@ public class QueueController : MonoBehaviour
                 {
                     //queuer
                     queuer.target = queue_list[i-1].transform;
+                    queuer.behind = queue_list[i + 1].transform;
                     queue_list[i].GetComponent<Queuer>().isLast = false;
                 }
                 else
@@ -56,6 +73,7 @@ public class QueueController : MonoBehaviour
                 {
                     //player out queue
                     queuer.target = queue_list[i - 1].transform;
+                    queuer.behind = null;
                     lastQueuerId = i;
                 }
                 else
@@ -68,6 +86,30 @@ public class QueueController : MonoBehaviour
         }
 
         
+    }
+
+    public void RenameObject( Transform obj , int number)
+    {
+        string currentName = obj.name;
+        string formattedNumber = number.ToString("D3"); // 转换为三位数格式
+
+        // 检测名称最后一个字符是否为数字
+        if (char.IsDigit(currentName.Last()))
+        {
+            // 替换最后的数字为新的三位数
+            int lastDigitIndex = currentName.Length - 1;
+            while (lastDigitIndex > 0 && char.IsDigit(currentName[lastDigitIndex - 1]))
+            {
+                lastDigitIndex--;
+            }
+            obj.name = currentName.Substring(0, lastDigitIndex) + formattedNumber;
+        }
+        else
+        {
+            // 在名称后添加三位数
+            obj.name = currentName + formattedNumber;
+        }
+
     }
 
     void GetChildrenRootTransforms()
@@ -97,6 +139,22 @@ public class QueueController : MonoBehaviour
     {
         //add player in last
         queue_list.Add(transform);
+    }
+
+    public void InsertIntoQueue(Transform transform , int i)
+    {
+        if (!queue_list.Contains(transform))
+        {
+            if( 0 <= i &&  i < queue_list.Count)
+            {
+                queue_list.Insert(i, transform);
+            }
+            else
+            {
+                Debug.LogError("worong insert in queue controller");
+            }
+        }
+        
     }
 
     public void RemoveFromQueue(Transform transform) {  queue_list.Remove(transform); }
