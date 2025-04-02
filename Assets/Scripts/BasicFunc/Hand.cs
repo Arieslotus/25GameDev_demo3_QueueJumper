@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//挂在玩家前臂上，用于向holdController发送抓取物体消息
 public class Hand : MonoBehaviour
 {   
     PlayerHoldController holdController;
@@ -20,17 +21,17 @@ public class Hand : MonoBehaviour
             holdController = FindObjectOfType<PlayerHoldController>();
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(2))
         {
             flag_canHold = true;
 
 
         }
-        else if (Input.GetMouseButton(0))
+        else if (Input.GetMouseButton(2))
         {
 
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(2))
         {
             flag_canHold = false;
 
@@ -46,14 +47,13 @@ public class Hand : MonoBehaviour
                 holdController.grabbedObj = other.gameObject;
 
             }
-            
-            //if (holdController.grabbedObj != null && flag)
-            //{
-
-
-
-            //    flag = false;
-            //}
+        }
+        else if(other.gameObject.CompareTag("jumper") && flag_canHold)
+        {
+            if (holdController.grabbedObj == null)
+            {
+                holdController.grabbedObj = other.gameObject;
+            }
         }
     }
 

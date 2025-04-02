@@ -111,7 +111,7 @@ MonoBehaviour:
     m_Value: {r: 0.06722437, g: 0.13575415, b: 0.20754719, a: 1}
   Scale:
     m_OverrideState: 1
-    m_Value: 1.75
+    m_Value: 1.28
   DepthThreshold:
     m_OverrideState: 1
     m_Value: 10

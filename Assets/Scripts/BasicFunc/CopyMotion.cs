@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//用于玩家模型从另外模型上复制动画
 public class CopyMotion : MonoBehaviour
 {
     public Transform targetLimb;//follow limb

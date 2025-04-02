@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+//挂在玩家的hip子物体上，用于玩家移动、跳跃、加速、朝向控制
+//如果修改镜头控制，建议同时检查玩家控制
+
 public class PlayerController : MonoBehaviour
 {
-    public float speed;
-    public float jumpForce;
+    public float speed; //移动速度
+    public float jumpForce; //跳跃高度
     //public float rotationSpeed = 10f; // 旋转速度
-    public ConfigurableJoint hipJoints;
-    Vector3 targetRot = Vector3.zero;
-    Vector3 moveDirection = Vector3.zero;
+    public ConfigurableJoint hipJoints; //hip的configureJoint
+    Vector3 targetRot = Vector3.zero; //朝向旋转角度
+    Vector3 moveDirection = Vector3.zero;//移动方向向量
 
-    public Rigidbody hips;
-    public bool isGrounded;
+    public Rigidbody hips;//hip的rb
+    [HideInInspector]public bool isGrounded;//玩家是否接触地面
 
-    public Animator animator;
+    public Animator animator;//复制动作的模型的那个animator
 
 
     void Start()
@@ -70,9 +73,9 @@ public class PlayerController : MonoBehaviour
         //move
         if (!isGrounded) return;
 
-        
+        //玩家镜头和移动控制到底咋控制？
         moveDirection = Vector3.zero;
-        WalkAndRun(KeyCode.W , Vector3.forward);
+        WalkAndRun(KeyCode.W , Vector3.forward); //Vector3.forward
         WalkAndRun(KeyCode.A , -Vector3.right);
         WalkAndRun(KeyCode.S , -Vector3.forward);
         WalkAndRun(KeyCode.D , Vector3.right);

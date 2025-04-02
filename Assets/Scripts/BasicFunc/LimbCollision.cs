@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+//挂在玩家每个有碰撞体的肢体上，用于检测玩家是否在地面，从而检测能不能起跳
 public class LimbCollision : MonoBehaviour
 {
     private PlayerController controller;

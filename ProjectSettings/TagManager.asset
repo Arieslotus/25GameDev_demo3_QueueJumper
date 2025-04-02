@@ -6,6 +6,7 @@ TagManager:
   tags:
   - canGrab
   - ground
+  - jumper
   layers:
   - Default
   - TransparentFX
@@ -13,8 +14,8 @@ TagManager:
   - 
   - Water
   - UI
-  - noSelfCollision
-  - 
+  - noSelfCollision_player
+  - noSelfCollision_jumper
   - 
   - 
   - 
